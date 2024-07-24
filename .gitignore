@@ -1,0 +1,8 @@
+out/
+node_modules/
+.devbox/
+.cpcache/
+.clj-kondo/
+.lsp/
+.shadow-cljs/
+dev-resources/public/assets/app/build/
