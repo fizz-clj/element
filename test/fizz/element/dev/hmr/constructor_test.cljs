@@ -294,6 +294,7 @@
            (js/Reflect.getPrototypeOf instance))
         "protype of the instance should be set to the latest constructor")
 
-    (is (= 1))))
+    (is (= tag-name (first @!constructor-slot)))
+    (is (= instance (second @!constructor-slot)))))
 
 
