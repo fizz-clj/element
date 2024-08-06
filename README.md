@@ -4,6 +4,10 @@ Simple, declarative custom web elements in Clojure(Script).
 
 Element is narrowly tailored to render custom components from their attributes.
 
+#### Status
+
+Experimental. For a more mature Clojure custom elements library, see [subzero](https://github.com/raystubbs/subzero).
+
 ## Example
 
 Define a component in a cljc file:
@@ -16,7 +20,9 @@ Define a component in a cljc file:
   [:div [:p (str "Your number is " number)]])
 
 (f/define! "my-custom-component" 
-  {:attributes #{:number}]
+  {:observed-attributes #{:number}]
+   :shadow-mode :open          ;; default
+   :form-associated false      ;; default
    :render my-custom-component}
 ```
 
@@ -69,3 +75,8 @@ This can be streamed to the client, loaded to the DOM as the bytes are received,
 **State management**. Focus on rendering custom web element from its attributes. Leave more sophisticated state management to other libraries.
 
 **Open for extension**. Leave the question of how events and changes are handled open.
+
+## Prior Work
+
+- [Subzero](https://github.com/raystubbs/subzero).
+- [Facet](https://github.com/kgscialdone/facet)
