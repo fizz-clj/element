@@ -1,0 +1,22 @@
+{:paths ["src" "resources"]
+ :deps {io.github.borkdude/html {:mvn/version "0.1.1"}}
+
+ :aliases
+ {:dev {:extra-paths ["dev" "dev-resources"]
+        :extra-deps {org.clojure/clojurescript {:mvn/version "1.11.54"}
+                     thheller/shadow-cljs {:mvn/version "2.28.10"}
+                     nrepl/nrepl {:mvn/version "1.2.0"}
+                     cider/piggieback {:mvn/version "0.4.2"}
+                     missionary/missionary {:mvn/version "b.39"}
+                     com.hyperfiddle/rcf {:mvn/version "20220926-202227"}}}
+
+  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.2.0"}
+                       cider/piggieback {:mvn/version "0.4.2"}}}
+
+  :bench {:extra-deps {criterium/criterium {:mvn/version "0.4.6"}
+                       com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.2.2"}}}
+
+  :clj-test {:extra-paths ["test" "test-resources"]
+             :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}}
+             :exec-fn kaocha.runner/exec-fn
+             :exec-args {}}}}

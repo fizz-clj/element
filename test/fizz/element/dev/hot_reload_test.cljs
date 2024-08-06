@@ -2,6 +2,19 @@
   (:require [cljs.test :refer [is testing deftest]]
             [fizz.element.dev.hot-reload :as hr]))
 
+(defn make-component
+  [prototype methods]
+  (let [constructor
+        (fn constructor []
+          (js/Reflect.construct prototype #js [] constructor))
+        _ (set! (.-prototype constructor)
+                (js/Object.create (.-prototype prototype)
+                                  methods))]
+    constructor))
+
+(comment
+  (instance? js/HTMLElement (.-prototype (make-component js/HTMLElement #js {}))))
+
 (deftest test-init-class-proxies!
   (testing "Registering and updated class proxies"
     (let [class-name "my-custom-class"
@@ -106,10 +119,6 @@
                 #js {:configurable true
                      :value original-connected-cb
                      :writable true}
-                :foo
-                #js {:configurable true
-                     :value #(js/console.log "hi")
-                     :writable true}
                 :disconnectedCallback
                 #js {:configurable true
                      :value original-disconnected-cb
@@ -141,5 +150,134 @@
       (is (= #{} (get-in registry-after-disconnect
                          ["my-custom-el" :instances]))))))
 
+(deftest test-injection-of-proxy
+
+  (let [class-name "my-custom-array"
+
+        CustomArray
+        (fn CustomArray []
+          (js/Reflect.construct js/Array #js [] CustomArray))
+
+        prototype1
+        (->> (clj->js {:foo {:writeable true
+                             :configurable true
+                             :enumerable true
+                             :value "bar"}})
+             (js/Object.create (.-prototype js/Array)))
+
+        _ (set! (.-prototype CustomArray)
+                prototype1)
+
+        custom-array (js/Reflect.construct
+                      CustomArray #js [])
+
+        _ (assert (instance? CustomArray custom-array))
+        _ (assert (instance? js/Array custom-array))
+        _ (assert (= prototype1
+                     (js/Object.getPrototypeOf custom-array)))
+
+        CustomArrayTwo
+        (fn CustomArrayTwo []
+          (js/Reflect.construct js/Array #js [] CustomArrayTwo))
+
+        prototype2
+        (->> (clj->js {:foo {:writeable true
+                             :configurable true
+                             :enumerable true
+                             :value "baz"}})
+             (js/Object.create (.-prototype js/Array)))
+
+        _ (set! (.-prototype CustomArrayTwo)
+                prototype2)
+
+        foo-ret-before-injection (.-foo custom-array)
+
+        proxy
+        (js/Proxy.
+         (js/Object.getPrototypeOf CustomArray)
+         #js {:get (fn [_target property receiver]
+                     (js/Reflect.get
+                      (.-prototype CustomArrayTwo)
+                      property receiver))})
+
+        _ (hr/replace-proto-with-proxy! custom-array proxy)
+        foo-ret-after-injection (.-foo custom-array)]
+
+    (is (= "bar" foo-ret-before-injection))
+    (is (= "baz" foo-ret-after-injection))))
+
+(deftest test-proxy-patches-new-observed-attributes
+  (testing "Given that a new observed attribute is added
+    When that element is updated
+    Then the attribute update callback should be called"
+    (let [el-name "my-custom-el"
+
+          !a (atom [])
+          !registry (atom {})
+
+          attr-changed-callback
+          (fn [name old-value new-value]
+            (swap! !a conj [name old-value new-value]))
+
+          original-target
+          (js/Object.create
+           js/HTMLElement
+           #js {:observedAttributes
+                #js {:configurable true
+                     :writable true
+                     :value #js ["a"]}
+                :attributeChangedCallback
+                #js {:configurable true
+                     :writable true
+                     :value attr-changed-callback}})
+
+          proxy (hr/create-proxy "my-custom-el"
+                                 original-target
+                                 (fn [& _] original-target)
+                                 !registry)
+
+          _ (hr/initialize-class!
+             el-name original-target !registry)
+
+          _ (assert (= #{} (hr/get-untracked-attributes
+                            el-name @!registry)))
+
+          instance (js/Reflect.construct proxy #js [])
+
+          _ (assert (instance? js/HTMLElement instance))
+
+          ;_ (.setAttribute proxy "b" 1)
+
+          after-initial-call @!a]
+
+      (= []))))
+
+(deftest test-proxy-protype
+  (testing "Given that I have a web component class
+    When I proxy its protoype
+    And I update the class
+    Then it uses its proxies"))
+
 (deftest ^:integration test-creating-and-registering-custom-element
-  ())
+  (testing "Given that I have proxied an element
+    When I register it on the DOM
+    Then no error is thrown"
+    (let [class-name (str "custom-el-" (random-uuid))
+
+          !registry (atom {})
+
+          original-target
+          (js/Object.create js/HTMLElement #js {})
+
+          proxy
+          (hr/create-proxy class-name
+                           original-target
+                           (fn [& _] original-target)
+                           !registry)
+          _ (js/window.customElements.define
+             class-name original-target)])))
+
+
+
+
+

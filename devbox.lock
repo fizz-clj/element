@@ -1,0 +1,194 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "clojure@1.11.3": {
+      "last_modified": "2024-07-07T16:08:25Z",
+      "resolved": "github:NixOS/nixpkgs/ab82a9612aa45284d4adf69ee81871a389669a9e#clojure",
+      "source": "devbox-search",
+      "version": "1.11.3.1463",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/gwq5vq8451gbpvmr2fwj5yld13nrrq3x-clojure-1.11.3.1463",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/gwq5vq8451gbpvmr2fwj5yld13nrrq3x-clojure-1.11.3.1463"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hjhh3npankxs04bxxmwv4m6mrky9z5kx-clojure-1.11.3.1463",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hjhh3npankxs04bxxmwv4m6mrky9z5kx-clojure-1.11.3.1463"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rgiza9pzmsbhaxirgmhz776hd791hyl4-clojure-1.11.3.1463",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/rgiza9pzmsbhaxirgmhz776hd791hyl4-clojure-1.11.3.1463"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/lffx923q94z28yfpc3p61w6yfigxnag9-clojure-1.11.3.1463",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/lffx923q94z28yfpc3p61w6yfigxnag9-clojure-1.11.3.1463"
+        }
+      }
+    },
+    "jdk@22": {
+      "last_modified": "2024-07-07T07:43:47Z",
+      "resolved": "github:NixOS/nixpkgs/b60793b86201040d9dee019a05089a9150d08b5b#jdk22",
+      "source": "devbox-search",
+      "version": "22.0.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6ny3pv46pf06pmxn61aq3k8wd6cyhjdb-zulu-ca-jdk-22.0.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/6ny3pv46pf06pmxn61aq3k8wd6cyhjdb-zulu-ca-jdk-22.0.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/1rh9xyjsdw3ri7ha5l8hv3x01p6z42r7-zulu-ca-jdk-22.0.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/1rh9xyjsdw3ri7ha5l8hv3x01p6z42r7-zulu-ca-jdk-22.0.0"
+        }
+      }
+    },
+    "nodejs@22.3.0": {
+      "last_modified": "2024-07-07T16:08:25Z",
+      "plugin_version": "0.0.2",
+      "resolved": "github:NixOS/nixpkgs/ab82a9612aa45284d4adf69ee81871a389669a9e#nodejs_22",
+      "source": "devbox-search",
+      "version": "22.3.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xfiwgna8wavxj8wzfn5ihp9kxdvcrphq-nodejs-22.3.0",
+              "default": true
+            },
+            {
+              "name": "libv8",
+              "path": "/nix/store/hn3z99jhkx7llshh1v0qmlfmnis144k1-nodejs-22.3.0-libv8"
+            }
+          ],
+          "store_path": "/nix/store/xfiwgna8wavxj8wzfn5ihp9kxdvcrphq-nodejs-22.3.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/q7cgrvb6clq0pdp5hlwmq2lldzkl3fmj-nodejs-22.3.0",
+              "default": true
+            },
+            {
+              "name": "libv8",
+              "path": "/nix/store/5df5695winsxzf80q6z0m35zy3p60yw1-nodejs-22.3.0-libv8"
+            }
+          ],
+          "store_path": "/nix/store/q7cgrvb6clq0pdp5hlwmq2lldzkl3fmj-nodejs-22.3.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/3cqbw1xcmc0xml8s3ys7jviaxvqyjldy-nodejs-22.3.0",
+              "default": true
+            },
+            {
+              "name": "libv8",
+              "path": "/nix/store/zk7izr97gl525arvyi4mfwxnhx5wl7hx-nodejs-22.3.0-libv8"
+            }
+          ],
+          "store_path": "/nix/store/3cqbw1xcmc0xml8s3ys7jviaxvqyjldy-nodejs-22.3.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bmvx7ww7qfksjqsckmivkg3mqvjscfh8-nodejs-22.3.0",
+              "default": true
+            },
+            {
+              "name": "libv8",
+              "path": "/nix/store/w28gijyq24mmk1676gpbxw2xrkysxx1i-nodejs-22.3.0-libv8"
+            }
+          ],
+          "store_path": "/nix/store/bmvx7ww7qfksjqsckmivkg3mqvjscfh8-nodejs-22.3.0"
+        }
+      }
+    },
+    "process-compose@1.6.1": {
+      "last_modified": "2024-07-07T16:08:25Z",
+      "resolved": "github:NixOS/nixpkgs/ab82a9612aa45284d4adf69ee81871a389669a9e#process-compose",
+      "source": "devbox-search",
+      "version": "1.6.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/4hmjz30f4kq8jb5kdb8kr73dmy8c99k8-process-compose-1.6.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/4hmjz30f4kq8jb5kdb8kr73dmy8c99k8-process-compose-1.6.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/w7v9c80hshfpf257dihih8m4nxaridlv-process-compose-1.6.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/w7v9c80hshfpf257dihih8m4nxaridlv-process-compose-1.6.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/dq6jz4qdf10mdp0g99gvzivqgqq6lr1z-process-compose-1.6.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/dq6jz4qdf10mdp0g99gvzivqgqq6lr1z-process-compose-1.6.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/32frdhjfdpqcjdv7291xraj03dci6vkk-process-compose-1.6.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/32frdhjfdpqcjdv7291xraj03dci6vkk-process-compose-1.6.1"
+        }
+      }
+    }
+  }
+}

@@ -11,7 +11,9 @@
      a. Update the Proxy registry
      b. Check for new static properties, and add an event handler for them
      c. Hot reload existing instances
-     ")
+     "
+  (:require [clojure.set :as set]
+            [cljs.core :as c]))
 
 (defonce original-define
   (.-define js/window.customElements))
@@ -21,8 +23,28 @@
   (atom {}))
 
 (defn get-current-class
-  [class-name]
-  (get-in @class-proxies [class-name :current-class]))
+  ([class-name] (get-current-class class-name class-proxies))
+  ([class-name !registry]
+   (get-in !registry [class-name :current-class])))
+
+(defn get-observed-attributes
+  ([class-name]
+   (get-observed-attributes class-name @class-proxies))
+  ([class-name registry]
+   (get-in registry [class-name :observed-attributes])))
+
+(defn get-untracked-attributes
+  "Attributes added after initialization aren't tracked
+  by the browser."
+  ([class-name]
+   (get-untracked-attributes class-name @class-proxies))
+  ([class-name registry]
+   (let [observed-attributes
+         (get-observed-attributes class-name registry)
+         original-attributes
+         (get-in registry [class-name :original-observed-attributes])]
+     (set/difference (into #{} observed-attributes)
+                     (into #{} original-attributes)))))
 
 (defn- register-instance!
   "register an instance live in the DOM"
@@ -85,11 +107,8 @@
     "connectedCallback"
     "disconnectedCallback"})
 
-;; TODO - we also need to proxy the connected
-;; callback so that existing components are added
-;; to an internal registry, where we can update them.
 (defn- make-proxy-handler
-  "Make a proxy handler for class instances."
+  "`target` refers to an instance or a prototype"
   [class-name get-current-target !registry]
   (let [f (fn [method this & args]
             (cond
@@ -132,11 +151,18 @@
      proxy-methods)))
 
 (defn create-proxy
+  "`original-target` should be an instance or a prototype."
   ([class-name original-target get-current-target]
    (create-proxy class-name original-target get-current-target class-proxies))
   ([class-name original-target get-current-target !registry]
    (js/Proxy. original-target
               (clj->js (make-proxy-handler class-name get-current-target !registry)))))
+
+(defn replace-proto-with-proxy!
+  "Point the prototype of a Class/constructor fn to
+  the proxy for the original constructor fn"
+  ([instance proxy]
+   (js/Object.setPrototypeOf instance proxy)))
 
 (defn initialize-class!
   "Create proxies and register the class"
@@ -144,9 +170,11 @@
    (initialize-class! class-name class class-proxies))
   ([class-name class !registry]
    (let [class-proxy (create-proxy class-name class get-current-class)
-         m {:original-class class
+         m {:class-name class-name
+            :original-class class
             :current-class class
             :original-proxy class-proxy
+            :observed-attributes (.-observedAttributes class)
             :current-proxy class-proxy}]
      (init-class-proxies! class-name m !registry))))
 

@@ -6,3 +6,4 @@ node_modules/
 .lsp/
 .shadow-cljs/
 dev-resources/public/assets/app/build/
+.nrepl-port

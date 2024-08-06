@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/0.10.3/.schema/devbox.schema.json",
+  "packages": [
+    "nodejs@22.3.0",
+    "clojure@1.11.3",
+    "process-compose@1.6.1",
+    "jdk@22"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'Welcome to devbox!' > /dev/null"
+    ],
+    "scripts": {
+      "cljs-watch": [
+        "clj -A:dev:nrepl -M -m cljs.main -w src -w dev -w test -c fizz.element"
+      ],
+      "plain-repl": [
+        "clj -M:dev:clj-test:bench:nrepl -m nrepl.cmdline --middleware '[cider.piggieback/wrap-cljs-repl]'"
+      ],
+      "repl": [
+        "clj -M:dev:clj-test:bench:nrepl  -m nrepl.cmdline --middleware '[shadow.cljs.devtools.server.nrepl/middleware,cider.piggieback/wrap-cljs-repl]'"
+      ]
+    }
+  }
+}
