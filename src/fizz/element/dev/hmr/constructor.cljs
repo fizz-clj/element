@@ -8,8 +8,7 @@
   
   The constructor call trick involves ensuring that,
   when the the constructor runs, the CURRENT instance
-  is returned."
-  (:require [fizz.element.dev.hmr.patch :as patch]))
+  is returned.")
 
 (defn make
   "Make a constructor."
@@ -156,9 +155,14 @@
           (this-as this
                    (-> tag-name
                        (tag->current-class)
-                       (invoke-method-on "formStateRestoreCallback" this args))))]
+                       (invoke-method-on "formStateRestoreCallback" this args))))
+
+        attribute-changed-callback
+        (fn [& args])]
 
     ;; need attribute changed callback!
+    ;; need observed attributes
+    ;; need form association
     {:connectedCallback connected-callback
      :disconnectedCallback disconnected-callback
      :adoptedCallback adopted-callback

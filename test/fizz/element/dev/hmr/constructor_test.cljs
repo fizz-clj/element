@@ -267,6 +267,16 @@
                 (map second)
                 (map second))))))
 
+#_(deftest test-make-methods-attribute-changed-callback
+    (let [proto-methods
+          (clj->js
+           {:formAssociatedCallback
+            {:value (fn [& args]
+                      (swap! !a conj args))
+             :configurable true
+             :enumerable true
+             :writable true}})]))
+
 (deftest test-internal-upgrade!
   (let [!constructor-slot (atom nil)
         tag-name "my-custom-element"

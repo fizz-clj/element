@@ -2,7 +2,7 @@
   (:require [clojure.set :as set]))
 
 (defonce !registry
-  "if passed a class name, returns:
+  #_"if passed a class name, returns:
   
   the original and current classes, and the observed attributes
   

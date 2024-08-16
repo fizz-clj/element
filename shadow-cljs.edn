@@ -1,7 +1,12 @@
 {:deps {:aliases [:dev]}
- :dev-http {8888 "dev-resources/public"}
+ :dev-http {8888 "dev-resources/public"
+            8021 "out/test"}
  :builds {:dev {:target :browser
                 :devtools {:repl-pprint true}
                 :output-dir "dev-resources/public/assets/app/build/js"
                 :asset-path "dev-resources/assets/app/js"
-                :modules {:main {:entries [fizz.element]}}}}}
+                :modules {:main {:entries [fizz.element]}}}
+          :test
+          {:target :browser-test
+           :test-dir  "out/test"}}}
+
