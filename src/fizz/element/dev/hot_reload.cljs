@@ -18,18 +18,18 @@
 (defonce original-define
   (.-define js/window.customElements))
 
-(defonce class-proxies
+(defonce !registry
   ;"A map of the class name to a proxy for that name."
   (atom {}))
 
 (defn get-current-class
-  ([class-name] (get-current-class class-name class-proxies))
+  ([class-name] (get-current-class class-name !registry))
   ([class-name !registry]
    (get-in !registry [class-name :current-class])))
 
 (defn get-observed-attributes
   ([class-name]
-   (get-observed-attributes class-name @class-proxies))
+   (get-observed-attributes class-name @!registry))
   ([class-name registry]
    (get-in registry [class-name :observed-attributes])))
 
@@ -37,7 +37,7 @@
   "Attributes added after initialization aren't tracked
   by the browser."
   ([class-name]
-   (get-untracked-attributes class-name @class-proxies))
+   (get-untracked-attributes class-name @!registry))
   ([class-name registry]
    (let [observed-attributes
          (get-observed-attributes class-name registry)
@@ -60,7 +60,7 @@
 
 (defn init-class-proxies!
   ([class-name m]
-   (init-class-proxies! class-name m class-proxies))
+   (init-class-proxies! class-name m !registry))
   ([class-name {:keys [observed-attributes] :as m} !registry]
    (assert (= #{:class-name
                 :current-class
@@ -80,7 +80,7 @@
               (assoc class-proxies' class-name proxies))))))
 
 (defn register-new-proxies!
-  ([class-name m] (register-new-proxies! class-name m class-proxies))
+  ([class-name m] (register-new-proxies! class-name m !registry))
   ([class-name m !registry]
    (assert (= #{:current-class :current-proxy :observed-attributes}
               (into #{} (keys m))))
@@ -112,9 +112,17 @@
   [class-name get-current-target !registry]
   (let [f (fn [method this & args]
             (cond
-              (and (= method "get")
+              (and (= method "get") ;; return the original proto
                    (= (first args) "prototype"))
               (apply (.-get js/Reflect) this (to-array args))
+
+              #_(and (= method "get")
+                     (= (first args) "setAttribute"))
+              ;; Check to see if the attribute is in the subsequently
+              ;; added attrs
+              ;; if so, then call attribute changed callback
+              #_(this-as this
+                         (fn [name]))
 
               ;; Capture the instances when they connect
               (and (= method "get")
@@ -153,7 +161,7 @@
 (defn create-proxy
   "`original-target` should be an instance or a prototype."
   ([class-name original-target get-current-target]
-   (create-proxy class-name original-target get-current-target class-proxies))
+   (create-proxy class-name original-target get-current-target !registry))
   ([class-name original-target get-current-target !registry]
    (js/Proxy. original-target
               (clj->js (make-proxy-handler class-name get-current-target !registry)))))
@@ -167,7 +175,7 @@
 (defn initialize-class!
   "Create proxies and register the class"
   ([class-name class]
-   (initialize-class! class-name class class-proxies))
+   (initialize-class! class-name class !registry))
   ([class-name class !registry]
    (let [class-proxy (create-proxy class-name class get-current-class)
          m {:class-name class-name
@@ -181,7 +189,7 @@
 (defn update-class!
   "Create a proxy update the proxy and the class"
   ([class-name class]
-   (update-class! class-name class class-proxies))
+   (update-class! class-name class !registry))
   ([class-name class !registry]
    (let [new-proxy (create-proxy class-name class get-current-class)]
      (register-new-proxies! class-name
@@ -191,15 +199,10 @@
 
 (defn define-custom-element!
   "the function to replace customElements.define in development"
-  [class-name class o]
-  (if (js/customElements.get class-name)
-    (update-class! class-name class)
-    (do (original-define class-name class o)
-        (initialize-class! class-name class))))
+  [class-name class !registry]
+  (if (@!registry class-name)
+    (update-class! class-name class !registry)
+    (do (js/customElements.define class-name class)
+        (initialize-class! class-name class !registry))))
         ;; TODO hot reload here!
-
-(defn hot-reload-on!
-  []
-  (set! (.-define js/CustomElements)
-        define-custom-element!))
 

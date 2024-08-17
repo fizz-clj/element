@@ -8,13 +8,19 @@
   (let [constructor
         (fn constructor []
           (js/Reflect.construct prototype #js [] constructor))
+
         _ (set! (.-prototype constructor)
                 (js/Object.create (.-prototype prototype)
                                   methods))]
     constructor))
 
 (comment
-  (instance? js/HTMLElement (.-prototype (make-component js/HTMLElement #js {}))))
+  (js/customElements.define
+   (str "custom-el" (random-uuid))
+   (make-component js/HTMLElement #js {}))
+
+  (isa? (.-prototype (make-component js/HTMLElement #js {}))
+        js/HTMLElement))
 
 (deftest test-init-class-proxies!
   (testing "Registering and updated class proxies"
@@ -153,9 +159,7 @@
 
 (deftest test-injection-of-proxy
 
-  (let [class-name "my-custom-array"
-
-        CustomArray
+  (let [CustomArray
         (fn CustomArray []
           (js/Reflect.construct js/Array #js [] CustomArray))
 
@@ -261,28 +265,65 @@
     Then it uses its proxies"))
 
 (deftest ^:integration test-creating-and-registering-custom-element
-  (testing "Given that I have proxied an element
-    When I register it on the DOM
-    Then no error is thrown"
+  (testing "Given that I have proxied an element "
     (let [class-name (str "custom-el-" (random-uuid))
 
           !registry (atom {})
+          !a (atom [])
 
-          original-proto
-          (js/Object.create js/HTMLElement #js {})
+          original-methods
+          #js {:attributeChangedCallback
+               #js {:configurable true
+                    :writable true
+                    :value (fn [& _]
+                             (swap! !a conj :original))}
+               :observedAttributes
+               #js {:configurable true
+                    :writeable true
+                    :value #js ["a"]}}
 
-          proxy
-          (hr/create-proxy class-name
-                           original-proto
-                           (fn [& _] original-proto)
-                           !registry)
+          new-methods
+          #js {:attributeChangedCallback
+               #js {:configurable true
+                    :writable true
+                    :value (fn [& _]
+                             (swap! !a conj :new))}
+               :observedAttributes
+               #js {:configurable true
+                    :writeable true
+                    :value #js ["a"]}}
+
+          new-ctor (make-component js/HTMLElement  new-methods)
 
           original-ctor
-          (make-component proxy js/HTMLElement)
+          (make-component js/HTMLElement original-methods)
 
-          _ (js/window.customElements.define
-             class-name original-ctor)]
-      (is true))))
+          _ (hr/define-custom-element! class-name original-ctor !registry)
+
+        ;  _ (hr/define-custom-element! class-name new-ctor !registry)
+
+          el (js/document.createElement class-name)]
+
+      ;; Crux of the problem here: what is the protoype of
+      ;; the constructor? Is it HTMLElement or another protype
+      ;; that extends html element?
+      ;; Answer: use the API functions!
+      (def el el)
+      (def el-proto (js/Reflect.getPrototypeOf el))
+      (def new-proto new-proto)
+      (.-attributeChangedCallback el)
+      (.-observedAttributes el)
+
+      (testing "When I register it on the DOM
+         Then no error is thrown"
+        (js/document.body.appendChild el)
+        (is true))
+
+      #_(testing "When I change an observed attribute
+        Then the attribute changed callback on the new proto should be called
+        "
+          (.setAttribute el "a" "b")
+          (is (= @!a [:new]))))))
 
 
 
