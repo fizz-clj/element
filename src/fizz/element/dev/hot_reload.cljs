@@ -158,7 +158,7 @@
                            (.apply orig-cb this (to-array args)))))
 
               :else
-              (apply (.-get js/Reflect)
+              (apply (js/Reflect.get js/Reflect method)
                      (get-current-target)
                      (to-array args))))]
     (reduce
