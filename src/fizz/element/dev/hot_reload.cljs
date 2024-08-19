@@ -15,23 +15,32 @@
   (:require [clojure.set :as set]
             [cljs.core :as c]))
 
-(defonce original-define
-  (.-define js/window.customElements))
-
 (defonce !registry
   ;"A map of the class name to a proxy for that name."
   (atom {}))
 
 (defn get-current-class
-  ([class-name] (get-current-class class-name !registry))
-  ([class-name !registry]
-   (get-in !registry [class-name :current-class])))
+  ([class-name] (get-current-class class-name @!registry))
+  ([class-name registry]
+   (get-in registry [class-name :current-class])))
+
+(defn get-current-proxy
+  ([class-name] (get-current-proxy class-name @!registry))
+  ([class-name registry]
+   (get-in registry [class-name :current-proxy])))
 
 (defn get-observed-attributes
   ([class-name]
    (get-observed-attributes class-name @!registry))
   ([class-name registry]
    (get-in registry [class-name :observed-attributes])))
+
+(defn get-current-prototype
+  ([class-name]
+   (get-current-prototype class-name @!registry))
+  ([class-name registry]
+   (some-> (get-current-class class-name registry)
+           (.-prototype))))
 
 (defn get-untracked-attributes
   "Attributes added after initialization aren't tracked
